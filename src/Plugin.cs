@@ -12,14 +12,22 @@ using BepInEx;
 
 namespace QM_BepInExCompatibility
 {
-    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.0.0")]
+
+
+    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.1.0")]
     public class Plugin : BaseUnityPlugin
     {
+
+        public static string CustomWorkshopPath { get; set; }
 
         public static BepInEx.Logging.ManualLogSource Log { get; set; }
 
         public void Awake()
         {
+            CustomWorkshopPath = Config.Bind<string>("General", nameof(Plugin.CustomWorkshopPath), null, @"If set, will be the workshop path used to load the games.  If blank, will assume it is in the steam install path.  Directory is usually found at " +
+                @"<steam install dir>\steamapps\workshop\").Value;
+
+
             Log = Logger;
             LoadAllWorkshopDlls();
         }
@@ -78,7 +86,19 @@ namespace QM_BepInExCompatibility
 
         public static string GetSteamWorkshopForGame(string gameId)
         {
-            string workshopPath = Path.Combine(GetSteamInstallDirectory(), @"steamapps\workshop\content", gameId);
+            string workshopPath;
+
+            if (! string.IsNullOrWhiteSpace(Plugin.CustomWorkshopPath))
+            {
+                workshopPath = Path.Combine(Plugin.CustomWorkshopPath, @"content", gameId);
+
+                Debug.Log($"Using custom workshop path: '{workshopPath}'");
+
+            }
+            else
+            {
+                workshopPath = Path.Combine(GetSteamInstallDirectory(), @"steamapps\workshop\content", gameId);
+            }
 
             if (!Directory.Exists(workshopPath))
             {

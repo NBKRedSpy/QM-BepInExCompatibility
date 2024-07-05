@@ -4,6 +4,22 @@ A BepInEx mod that fixes Quasimorph Steam Workshop mod load issues when BepInEx 
 
 This is *only* required if BepInEx is installed and running.
 
+Install the mod and the workaround will be executed.
+
+# Configuration
+
+The configuration file can be found at ```BepInEx\config\nbk_redspy.QM-BepInExCompatibility.cfg```
+The file will be created when the game is run once after the install.
+
+
+The CustomWorkshopPath below is a hack for Steam installs where the game's libraries are installed in a different directory than the default install.
+
+|Name|Default|Description|
+|--|--|--|
+|CustomWorkshopPath|""|If set, will be the workshop path used to load the games.  If blank, will assume it is in the steam install path.  Directory is usually found at <steam install dir>\steamapps\workshop\|
+
+
+
 # Issue
 When BepInEx is installed, a component called Doorstop prevents Steam Workshop mods from loading any dlls that are in the mod's directory.
 This is because Doorstop excludes searching the mod's folder and instead only searches the game's and  BepInEx's directories.
