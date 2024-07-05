@@ -52,7 +52,7 @@ Implement this same functionality by having the mod dll call the Assembly.LoadFr
 
 Add every Steam Workshop mod's path in the ```doorstop_config.ini``` search path.
 
-```dll_search_path_override =``
+```dll_search_path_override =```
 
 Example:
 
