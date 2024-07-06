@@ -9,12 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using BepInEx;
+using System.Text.RegularExpressions;
 
 namespace QM_BepInExCompatibility
 {
 
 
-    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.1.0")]
+    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.2.0")]
     public class Plugin : BaseUnityPlugin
     {
 
@@ -35,7 +36,7 @@ namespace QM_BepInExCompatibility
         public static void LoadAllWorkshopDlls()
         {
             //Find the workshop directory.
-            string workshopPath = GetSteamWorkshopForGame("2059170");
+            string workshopPath = GetSteamWorkshopPathForGame("2059170");
 
             Log.LogInfo($"QM_BepInExCompatibility loading all dlls at {workshopPath}");
 
@@ -84,11 +85,12 @@ namespace QM_BepInExCompatibility
             return (string)installDir;
         }
 
-        public static string GetSteamWorkshopForGame(string gameId)
+
+        public static string GetSteamWorkshopPathForGame(string gameId)
         {
             string workshopPath;
 
-            if (! string.IsNullOrWhiteSpace(Plugin.CustomWorkshopPath))
+            if (!string.IsNullOrWhiteSpace(Plugin.CustomWorkshopPath))
             {
                 workshopPath = Path.Combine(Plugin.CustomWorkshopPath, @"content", gameId);
 
@@ -97,7 +99,7 @@ namespace QM_BepInExCompatibility
             }
             else
             {
-                workshopPath = Path.Combine(GetSteamInstallDirectory(), @"steamapps\workshop\content", gameId);
+                workshopPath = Path.Combine(GetGameLibraryPath(GetSteamInstallDirectory(), gameId), @"steamapps\workshop\content", gameId);
             }
 
             if (!Directory.Exists(workshopPath))
@@ -106,6 +108,55 @@ namespace QM_BepInExCompatibility
             }
 
             return workshopPath;
+        }
+
+
+        /// <summary>
+        /// Returns the path to the library that the game is installed in.
+        /// </summary>
+        /// <remarks>
+        /// Steam allows multiple "libraries" which are folders that games are install in. 
+        /// Generally these are different hard drives.
+        /// By default, Steam creates on library in the Steam install directory.
+        /// </remarks>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException"></exception>
+        public static string GetGameLibraryPath(string steamInstallDir, string gameId)
+        {
+            //VDF partial example.
+            //"libraryfolders"
+            //{
+            //	"0"
+            //	{
+            //		"path"		"D:\\Games\\Steam"
+            //		"label"		""
+            //		"contentid"		"3171027898365237378"
+            //		"totalsize"		"0"
+            //		"update_clean_bytes_tally"		"33254275411"
+            //		"time_last_update_corruption"		"0"
+            //		"apps"
+            //		{
+            //			"228980"		"432102418"
+
+            List<string> text = File.ReadAllLines(Path.Combine(steamInstallDir, @"steamapps\libraryfolders.vdf")).ToList();
+
+            int index = text.FindIndex(x => x.StartsWith($"\t\t\t\"{gameId}\""));
+
+            for (int i = index; i > 0; i--)
+            {
+                string line = text[i];
+
+                Match match = Regex.Match(line, @"^\t\t\""path\""\t\t\""(.+)\""$");
+                if (match.Success)
+                {
+                    //The paths are escaped.
+                    string libraryPath = match.Groups[1].Value.Replace(@"\\", @"\");
+                    return libraryPath;
+                }
+            }
+
+            throw new ApplicationException("Unable to find the steam library from the libraryfolders.vdf");
         }
     }
 }

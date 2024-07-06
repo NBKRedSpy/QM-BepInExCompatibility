@@ -61,8 +61,12 @@ It would be best to test the mod with no other subscribed mods.
 
 
 # Alternatives To This Mod
+
+## Manifest Change For Every Mod
+For every mod, add all dlls in the directory to the "Assemblies" entry in the modmanifest.json.
+
 ## Custom dll Load
-Implement this same functionality by having the mod dll call the Assembly.LoadFrom for each dll in their mod folder.  Any mod that does not do this and has references will fail to load.
+Implement this mod's functionality by using Assembly.LoadFrom on all the dlls in the directory.  However, every mod author would have to do this.
 
 ## Change Doorstop Config
 
@@ -73,3 +77,8 @@ Add every Steam Workshop mod's path in the ```doorstop_config.ini``` search path
 Example:
 
 ```dll_search_path_override = <Steam Dir>>\steamapps\workshop\content\2059170\3282459391;<Steam Dir>>\steamapps\workshop\content\2059170\1234567890```
+
+# Change Log
+## 1.2.0
+
+Supports multiple Steam libraries using Steam's libraryfolders.vdf file.
