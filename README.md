@@ -78,6 +78,10 @@ Example:
 
 ```dll_search_path_override = <Steam Dir>>\steamapps\workshop\content\2059170\3282459391;<Steam Dir>>\steamapps\workshop\content\2059170\1234567890```
 
+# Support
+If you enjoy my mods and want to leave a tip, check out my [Ko-Fi](https://ko-fi.com/nbkredspy71915) page.
+Thanks!
+
 # Change Log
 ## 1.2.0
 
