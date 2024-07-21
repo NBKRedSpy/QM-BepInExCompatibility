@@ -16,7 +16,7 @@ The CustomWorkshopPath below is a hack for Steam installs where the game's libra
 
 |Name|Default|Description|
 |--|--|--|
-|CustomWorkshopPath|""|If set, will be the workshop path used to load the games.  If blank, will assume it is in the steam install path.  Directory is usually found at <steam install dir>\steamapps\workshop\|
+|CustomModsPath|""|If set, will be used as the folder to search for mods|
 
 
 
@@ -83,6 +83,10 @@ If you enjoy my mods and want to buy me a coffee, check out my [Ko-Fi](https://k
 Thanks!
 
 # Change Log
+## 1.3.0
+
+Changed Custom path to indicate the root of a mods folder instead of expecting it to be a Steam Workshop layout.
+
 ## 1.2.0
 
 Supports multiple Steam libraries using Steam's libraryfolders.vdf file.

@@ -15,19 +15,17 @@ namespace QM_BepInExCompatibility
 {
 
 
-    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.2.0")]
+    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.3.0")]
     public class Plugin : BaseUnityPlugin
     {
 
-        public static string CustomWorkshopPath { get; set; }
+        public static string CustomModsPath { get; set; }
 
         public static BepInEx.Logging.ManualLogSource Log { get; set; }
 
         public void Awake()
         {
-            CustomWorkshopPath = Config.Bind<string>("General", nameof(Plugin.CustomWorkshopPath), null, @"If set, will be the workshop path used to load the games.  If blank, will assume it is in the steam install path.  Directory is usually found at " +
-                @"<steam install dir>\steamapps\workshop\").Value;
-
+            CustomModsPath = Config.Bind<string>("General", nameof(Plugin.CustomModsPath), null, @"If set, will be used as the folder to search for mods").Value;
 
             Log = Logger;
             LoadAllWorkshopDlls();
@@ -88,26 +86,26 @@ namespace QM_BepInExCompatibility
 
         public static string GetSteamWorkshopPathForGame(string gameId)
         {
-            string workshopPath;
+            string modsPath;
 
-            if (!string.IsNullOrWhiteSpace(Plugin.CustomWorkshopPath))
+            if (!string.IsNullOrWhiteSpace(Plugin.CustomModsPath))
             {
-                workshopPath = Path.Combine(Plugin.CustomWorkshopPath, @"content", gameId);
+                modsPath = CustomModsPath;
 
-                Debug.Log($"Using custom workshop path: '{workshopPath}'");
+                Debug.Log($"Using custom mod path: '{modsPath}'");
 
             }
             else
             {
-                workshopPath = Path.Combine(GetGameLibraryPath(GetSteamInstallDirectory(), gameId), @"steamapps\workshop\content", gameId);
+                modsPath = Path.Combine(GetGameLibraryPath(GetSteamInstallDirectory(), gameId), @"steamapps\workshop\content", gameId);
             }
 
-            if (!Directory.Exists(workshopPath))
+            if (!Directory.Exists(modsPath))
             {
-                throw new ApplicationException($"Unable to find game's workshop at {workshopPath}");
+                throw new ApplicationException($"Unable to find game's workshop at {modsPath}");
             }
 
-            return workshopPath;
+            return modsPath;
         }
 
 
