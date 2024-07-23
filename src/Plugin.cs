@@ -15,7 +15,7 @@ namespace QM_BepInExCompatibility
 {
 
 
-    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.3.0")]
+    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.4.0")]
     public class Plugin : BaseUnityPlugin
     {
 
@@ -34,16 +34,16 @@ namespace QM_BepInExCompatibility
         public static void LoadAllWorkshopDlls()
         {
             //Find the workshop directory.
-            string workshopPath = GetSteamWorkshopPathForGame("2059170");
+            string modsPath = GetModsPath("2059170");
 
-            Log.LogInfo($"QM_BepInExCompatibility loading all dlls at {workshopPath}");
+            Log.LogInfo($"QM_BepInExCompatibility loading all dlls at {modsPath}");
 
             int assemblyCount = 0;
 
             try
             {
                 //Load every assembly in every sub folder.
-                foreach (string dllPath in Directory.EnumerateFiles(workshopPath, "*.dll", SearchOption.AllDirectories))
+                foreach (string dllPath in Directory.EnumerateFiles(modsPath, "*.dll", SearchOption.AllDirectories))
                 {
                     try
                     {
@@ -84,7 +84,7 @@ namespace QM_BepInExCompatibility
         }
 
 
-        public static string GetSteamWorkshopPathForGame(string gameId)
+        public static string GetModsPath(string steamGameId)
         {
             string modsPath;
 
@@ -93,19 +93,20 @@ namespace QM_BepInExCompatibility
                 modsPath = CustomModsPath;
 
                 Debug.Log($"Using custom mod path: '{modsPath}'");
-
-            }
-            else
-            {
-                modsPath = Path.Combine(GetGameLibraryPath(GetSteamInstallDirectory(), gameId), @"steamapps\workshop\content", gameId);
+                return modsPath;
             }
 
-            if (!Directory.Exists(modsPath))
-            {
-                throw new ApplicationException($"Unable to find game's workshop at {modsPath}");
-            }
+            //Try Game's mod directory.  This is only for non Steam version
+            modsPath = Path.Combine(Application.dataPath, "..",  "mods");
+            if (Directory.Exists(modsPath)) return modsPath;
 
-            return modsPath;
+            //Try for Steam
+            modsPath = Path.Combine(GetGameLibraryPath(GetSteamInstallDirectory(), steamGameId), @"steamapps\workshop\content", steamGameId);
+
+            if (Directory.Exists(modsPath)) return modsPath;
+
+            //No path found
+            throw new ApplicationException($"Unable to find game's workshop at {modsPath}");
         }
 
 

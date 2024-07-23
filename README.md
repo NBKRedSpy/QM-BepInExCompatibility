@@ -1,10 +1,13 @@
 # QM-BepInExCompatibility
 
-A BepInEx mod that fixes Quasimorph Steam Workshop mod load issues when BepInEx is installed and that mod has reference dlls in their folder.
-
 This is *only* required if BepInEx is installed and running.
 
+A BepInEx mod that fixes Quasimorph Steam Workshop mod load issues when BepInEx is installed and that mod has reference dlls in their folder.
+
 Install the mod and the workaround will be executed.
+
+By default, the mod will use the Quasimorph/mods folder if it exists.  If not the Steam Workshop directory.
+If the user has a CustomModsPath set in the config, that will always be used.
 
 # Configuration
 
@@ -83,6 +86,10 @@ If you enjoy my mods and want to buy me a coffee, check out my [Ko-Fi](https://k
 Thanks!
 
 # Change Log
+## 1.4.0
+* Support for non Steam versions.
+* If no custom folder is defined, searches for the game's `mods` folder and then for the Steam Workshop folder.
+
 ## 1.3.0
 
 Changed Custom path to indicate the root of a mods folder instead of expecting it to be a Steam Workshop layout.

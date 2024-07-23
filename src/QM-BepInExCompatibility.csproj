@@ -93,10 +93,19 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>ECHO Copying to prototype directory.  Ensure the manifest was updated.
-set targetDir=D:\Games\Steam\steamapps\common\Quasimorph\BepInEx\plugins\$(TargetName)\
+rem set targetDir=D:\Games\Steam\steamapps\common\Quasimorph\BepInEx\plugins\$(TargetName)\
+set targetDir=D:\Games\GOG\Quasimorph\BepInEx\plugins\$(TargetName)\
 
-xcopy /y $(TargetDir)$(TargetName).dll %25targetDir%25
-xcopy /y $(TargetDir)$(TargetName).pdb %25targetDir%25
+
+xcopy /f /y $(TargetDir)$(TargetName).dll %25targetDir%25
+xcopy /f /y $(TargetDir)$(TargetName).pdb %25targetDir%25
+
+set frameworkDir=C:\Windows\Microsoft.NET\Framework64\v4.0.30319
+
+xcopy /f /y %25frameworkDir%25\System.ServiceModel.Internals.dll %25targetDir%25
+xcopy /f /y %25frameworkDir%25\System.Transactions.dll %25targetDir%25
+
+
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets" Condition="Exists('packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')" />
