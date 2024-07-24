@@ -41,8 +41,10 @@ Note that if a dll is loaded more than once, the subsequent loads will use the v
 # Important! Harmony Based Mods
 When creating Harmony based mods with BepInEx installed, the mod may work with BepInEx installed, but not without it.  Workshop users will not have BepInEx installed.
 
-Make sure to include the following files to the Steam Workshop mod folder for a Harmony based mod.
+For Harmony Workshop mods, it is recommended to use Harmony instead of HarmonyX.  Harmony's nuget package is Lib.Harmony.
+In that case, the `0Harmony.dll` will need to be copied to the mod's folder.
 
+If using HarmonyX instead, the following files will need to be copied.
 ```
 0Harmony.dll
 Mono.Cecil.dll
@@ -50,10 +52,7 @@ MonoMod.RuntimeDetour.dll
 MonoMod.Utils.dll
 ```
 
-
 The reason is BepInEx will load the modding dlls from the BepInEx directories.  When BepInEx is not installed or enabled, the mod will not have the required dlls.
-
-
 
 Test the mod without BepInEx running.  BepInEx can be disabled by renaming the winhttp.dll in the game's directory.
 
