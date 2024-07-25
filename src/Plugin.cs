@@ -19,17 +19,18 @@ namespace QM_BepInExCompatibility
 {
 
 
-    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.4.0")]
+    [BepInPlugin("nbk_redspy.QM-BepInExCompatibility", "QM-BepInExCompatibility", "1.5.1")]
     public class Plugin : BaseUnityPlugin
     {
 
         public static string CustomModsPath { get; set; }
-
+        public static bool VerboseLogging { get; set; } 
         public static BepInEx.Logging.ManualLogSource Log { get; set; }
 
         public void Awake()
         {
             CustomModsPath = Config.Bind<string>("General", nameof(Plugin.CustomModsPath), null, @"If set, will be used as the folder to search for mods").Value;
+            VerboseLogging = Config.Bind<bool>("Logging", nameof(Plugin.VerboseLogging), false, @"Logs more information.").Value;
 
             Log = Logger;
             LoadAllWorkshopDlls();
@@ -78,13 +79,28 @@ namespace QM_BepInExCompatibility
 
                     try
                     {
-                        Log.LogInfo($"Loading {firstItem.FileName} {firstItem.FilePath} [{firstItem.Hash}]");
+
+                        if(VerboseLogging)
+                        {
+                            Log.LogInfo($"Loading {firstItem.FileName} {firstItem.FilePath} [{firstItem.Hash}]");
+                        }
+                        else
+                        {
+                            string dupesText = group.Count() > 1 ? $"({group.Count()} dupes) " : "";
+
+                            Log.LogInfo($"Loading {firstItem.FileName} {dupesText}");
+                        }
+
+
                         Assembly.LoadFrom(firstItem.FilePath);
 
-                        group.Skip(1).ToList().ForEach(x =>
+                        if (VerboseLogging)
                         {
-                            Log.LogInfo($"\t Already Loaded {x.FilePath}  [{firstItem.Hash}]");
-                        });
+                            group.Skip(1).ToList().ForEach(x =>
+                            {
+                                Log.LogInfo($"\t Already Loaded {x.FilePath}  [{firstItem.Hash}]");
+                            });
+                        }
                     }
                     catch (Exception ex)
                     {
