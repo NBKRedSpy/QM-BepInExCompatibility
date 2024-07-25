@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 using BepInEx;
 using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
+using UnityEngine.Assertions.Must;
+using System.Runtime.ExceptionServices;
+using sd = System.Diagnostics;
 
 namespace QM_BepInExCompatibility
 {
@@ -33,6 +37,8 @@ namespace QM_BepInExCompatibility
 
         public static void LoadAllWorkshopDlls()
         {
+             sd.Stopwatch stopwatch = sd.Stopwatch.StartNew();
+
             //Find the workshop directory.
             string modsPath = GetModsPath("2059170");
 
@@ -42,27 +48,56 @@ namespace QM_BepInExCompatibility
 
             try
             {
-                //Load every assembly in every sub folder.
-                foreach (string dllPath in Directory.EnumerateFiles(modsPath, "*.dll", SearchOption.AllDirectories))
+
+                //List of dlls
+                List<string> dllPaths = Directory.GetFiles(modsPath, "*.dll", SearchOption.AllDirectories).ToList();
+
+                ConcurrentBag<FileHashInfo> hashedInfo = new ConcurrentBag<FileHashInfo>();
+
+
+
+                Log.LogInfo("Getting DLL List");
+
+                //Load the files and hashes
+                Parallel.ForEach(dllPaths, x =>
                 {
+                    hashedInfo.Add(new FileHashInfo(x));
+                });
+
+                Log.LogInfo($"Hash compute time: {stopwatch.Elapsed}");
+
+                //Order by name for nicety.
+                IOrderedEnumerable<IGrouping<string, FileHashInfo>> loadingList
+                    = hashedInfo.OrderBy(x => x.FileName)
+                    .GroupBy(x => x.Hash)
+                    .OrderBy(x => x.First().FileName);
+
+                foreach (var group in loadingList)
+                {
+                    FileHashInfo firstItem = group.First();
+
                     try
                     {
-                        
-                        Log.LogInfo($"\t Loading: {dllPath}");
-                        Assembly.LoadFrom(dllPath);
+                        Log.LogInfo($"Loading {firstItem.FileName} {firstItem.FilePath} [{firstItem.Hash}]");
+                        Assembly.LoadFrom(firstItem.FilePath);
 
+                        group.Skip(1).ToList().ForEach(x =>
+                        {
+                            Log.LogInfo($"\t Already Loaded {x.FilePath}  [{firstItem.Hash}]");
+                        });
                     }
                     catch (Exception ex)
                     {
-                        
-                        Log.LogError($"Error loading assembly {dllPath}");
+
+                        Log.LogError($"Error loading assembly {firstItem.FilePath}");
                         Log.LogError(ex);
                     }
-
                     assemblyCount++;
                 }
 
-                Log.LogInfo($"QM_BepInExCompatibility loaded {assemblyCount} assemblies");
+                Log.LogInfo($"QM_BepInExCompatibility loaded {assemblyCount} unique assemblies");
+                Log.LogInfo($"QM_BepInExCompatibility load time: {stopwatch.Elapsed}");
+
             }
             catch (Exception ex)
             {
@@ -70,6 +105,7 @@ namespace QM_BepInExCompatibility
                 Log.LogError(ex);
             }
         }
+
 
         public static string GetSteamInstallDirectory()
         {
@@ -82,6 +118,7 @@ namespace QM_BepInExCompatibility
 
             return (string)installDir;
         }
+
 
 
         public static string GetModsPath(string steamGameId)
