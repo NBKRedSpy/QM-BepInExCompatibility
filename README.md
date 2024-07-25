@@ -85,6 +85,10 @@ If you enjoy my mods and want to buy me a coffee, check out my [Ko-Fi](https://k
 Thanks!
 
 # Change Log
+
+## 1.5.0
+Improved speed of loading.  From about 8 seconds to 2.5 seconds.  Avoids loading dupes since the Assembly Load takes the longest amount of time.
+
 ## 1.4.0
 * Support for non Steam versions.
 * If no custom folder is defined, searches for the game's `mods` folder and then for the Steam Workshop folder.
